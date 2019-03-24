@@ -13,16 +13,26 @@ import {
 } from '../api'
 
 // 授权成功的同步action
-const authSuccess = (user) => ({type: AUTH_SUCCESS, user})
+const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user})
 
 // 错误提示信息的同步action
-const errorMsg = (msg) => ({type: ERROR_MSG, msg})
+const errorMsg = (msg) => ({type: ERROR_MSG, data: msg})
 
 // 注册异步action
 export const register = (user) => {
+    const {username, password, password2, type} = user
+
+    // 做表单的前台检查，如果不通过，返回一个errorMsg的同步action
+    if (!username) {
+        return errorMsg('用户名必须指定')
+    } else if (password !== password2) {
+        return errorMsg('2次密码要一致')
+    }
+
+    // 表单数据合法，返回一个发ajax请求的异步action函数
     return async dispatch => {
         //发送注册的异步ajax请求
-        const response = await reqRegister(user)
+        const response = await reqRegister({username, password, type})
         const result = response.data
         if (result.code === 0) { // 成功
             // 授权成功的同步action
@@ -36,14 +46,23 @@ export const register = (user) => {
 
 // 登录异步action
 export const login = (user) => {
+    const {username, password} = user
+
+    // 做表单的前台检查，如果不通过，返回一个errorMsg的同步action
+    if (!username) {
+        return errorMsg('用户名必须指定')
+    } else if (!password) {
+        return errorMsg('密码必须指定')
+    }
+
     return async dispatch => {
         //发送注册的异步ajax请求
-        const response = await reqRegister(user)
+        const response = await reqLogin(user)
         const result = response.data
         if (result.code === 0) { // 成功
-
+            dispatch(authSuccess(result.data))
         } else { // 失败
-
+            dispatch(errorMsg(result.msg))
         }
     }
 }
