@@ -28,3 +28,6 @@ return config;
 
 安装less
 npm install --save-dev less@2.7.3 less-loader
+
+安装axios
+npm install --save axios
