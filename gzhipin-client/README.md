@@ -31,3 +31,6 @@ npm install --save-dev less@2.7.3 less-loader
 
 安装axios
 npm install --save axios
+
+安装cookie库 可以操作前端cookie的对象 set()/remove()
+npm install --save js-cookie
