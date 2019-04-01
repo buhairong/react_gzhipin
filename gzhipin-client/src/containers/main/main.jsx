@@ -6,13 +6,52 @@ import React, {Component} from 'react'
 import {Switch, Route, Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 import Cookies from 'js-cookie' // 可以操作前端cookie的对象 set()/get()/remove()
+import {NavBar} from 'antd-mobile'
 
 import LaobanInfo from '../laoban-info/laoban-info'
 import DashenInfo from '../dashen-info/dashen-info'
+import Dashen from '../dashen/dashen'
+import Laoban from '../laoban/laoban'
+import Message from '../message/message'
+import Personal from '../personal/personal'
+import NotFound from '../../components/not-found/not-found'
+
 import {getRedirectTo} from '../../utils'
 import {getUser} from '../../redux/actions'
 
 class Main extends Component {
+
+    // 给组件对象添加属性
+    navList = [ // 包含所有导航组件的相关信息数据
+        {
+            path: '/laoban', // 路由路径
+            component: Laoban,
+            title: '大神列表',
+            icon: 'dashen',
+            text: '大神',
+        },
+        {
+            path: '/dashen', // 路由路径
+            component: Dashen,
+            title: '老板列表',
+            icon: 'laoban',
+            text: '老板',
+        },
+        {
+            path: '/message', // 路由路径
+            component: Message,
+            title: '消息列表',
+            icon: 'message',
+            text: '消息'
+        },
+        {
+            path: '/personal', // 路由路径
+            component: Personal,
+            title: '用户中心',
+            icon: 'personal',
+            text: '个人',
+        }
+    ]
 
     componentDidMount () {
         // 曾经登录过（cookie中有userid），但是还没有登录(redux管理的user中没有_id)，发请求获取对应的user
@@ -51,12 +90,22 @@ class Main extends Component {
             }
         }
 
+        const {navList} = this
+        const path = this.props.location.pathname // 请求的路径
+        const currentNav = navList.find(nav => nav.path === path) // 得到当前的nav,可能没有
+
         return (
             <div>
+                {currentNav ? <NavBar>currentNav.title</NavBar> : null}
                 <Switch>
+                    {
+                        navList.map(nav => <Route path={nav.path} component={nav.component} />)
+                    }
                     <Route path='/laobaninfo' component={LaobanInfo} />
                     <Route path='/dasheninfo' component={DashenInfo} />
+                    <Route component={NotFound} />
                 </Switch>
+                {currentNav ? <div>底部导航</div> : null}
             </div>
         )
     }
