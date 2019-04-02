@@ -7,13 +7,15 @@ import {
     AUTH_SUCCESS,
     ERROR_MSG,
     RECEIVE_USER,
-    RESET_USER
+    RESET_USER,
+    RECEIVE_USER_LIST
 } from './action-types'
 import {
     reqRegister,
     reqLogin,
     reqUpdateUser,
-    reqUser
+    reqUser,
+    reqUserList
 } from '../api'
 
 // 授权成功的同步action
@@ -26,7 +28,10 @@ const errorMsg = (msg) => ({type: ERROR_MSG, data: msg})
 const receiveUser = (user) => ({type: RECEIVE_USER, data: user})
 
 // 重置用户的同步action
-const resetUser = (msg) => ({type: RECEIVE_USER, data: msg})
+export const resetUser = (msg) => ({type: RESET_USER, data: msg})
+
+// 接收用户列表的同步action
+export const receiveUserList = (userList) => ({type: RECEIVE_USER_LIST, data: userList})
 
 // 注册异步action
 export const register = (user) => {
@@ -46,7 +51,7 @@ export const register = (user) => {
         const result = response.data
         if (result.code === 0) { // 成功
             // 授权成功的同步action
-            dispatch(authSuccess(result.data))
+            dispatch({type: AUTH_SUCCESS, data: user})
         } else { // 失败
             // 分发错误提示信息的同步action
             dispatch(errorMsg(result.msg))
@@ -103,3 +108,17 @@ export const getUser = () => {
         }
     }
 }
+
+// 获取用户列表的异步action
+export const getUserList = (type) => {
+    return async dispatch => {
+        // 执行异步ajax请求
+        const response = await reqUserList(type)
+        const result = response.data
+        // 得到结果后，分发一个同步action
+        if (result.code === 0) {
+            dispatch(receiveUserList(result.data))
+        }
+    }
+}
+

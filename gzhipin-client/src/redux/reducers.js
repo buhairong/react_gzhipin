@@ -7,7 +7,8 @@ import {
     AUTH_SUCCESS,
     ERROR_MSG,
     RECEIVE_USER,
-    RESET_USER
+    RESET_USER,
+    RECEIVE_USER_LIST
 } from './action-types'
 
 import {getRedirectTo} from '../utils'
@@ -30,6 +31,17 @@ function user (state = initUser, action) {
             return action.data
         case RESET_USER: // data是msg
             return {...initUser, msg: action.data}
+        default:
+            return state
+    }
+}
+
+const initUserList = []
+// 产生userlist状态的reducer
+function userlist (state = initUserList, action) {
+    switch (action.type) {
+        case RECEIVE_USER_LIST: // data为userlist
+            return action.data
         default:
             return state
     }
