@@ -15,6 +15,7 @@ import Laoban from '../laoban/laoban'
 import Message from '../message/message'
 import Personal from '../personal/personal'
 import NotFound from '../../components/not-found/not-found'
+import NavFooter from '../../components/nav-footer/nav-footer'
 
 import {getRedirectTo} from '../../utils'
 import {getUser} from '../../redux/actions'
@@ -93,19 +94,29 @@ class Main extends Component {
         const {navList} = this
         const path = this.props.location.pathname // 请求的路径
         const currentNav = navList.find(nav => nav.path === path) // 得到当前的nav,可能没有
+        if (currentNav) {
+            // 决定哪个路由需要隐藏
+            if (user.type === 'laoban') {
+                // 隐藏数组的第2个
+                navList[1].hide = true
+            } else {
+                // 隐藏数组的第1个
+                navList[0].hide = true
+            }
+        }
 
         return (
             <div>
-                {currentNav ? <NavBar>currentNav.title</NavBar> : null}
+                {currentNav ? <NavBar>{currentNav.title}</NavBar> : null}
                 <Switch>
                     {
-                        navList.map(nav => <Route path={nav.path} component={nav.component} />)
+                        navList.map(nav => <Route key={nav.path} path={nav.path} component={nav.component} />)
                     }
                     <Route path='/laobaninfo' component={LaobanInfo} />
                     <Route path='/dasheninfo' component={DashenInfo} />
                     <Route component={NotFound} />
                 </Switch>
-                {currentNav ? <div>底部导航</div> : null}
+                {currentNav ? <NavFooter navList={navList} /> : null}
             </div>
         )
     }
