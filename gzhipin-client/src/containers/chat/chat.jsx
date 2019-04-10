@@ -32,7 +32,9 @@ class Chat extends Component {
 
         // 计算当前聊天的chatId
         const meId = user._id
-        if (!users[meId]) { // 如果还没有获取数据，直接不做任何显示
+        console.log("meId="+meId)
+        console.log("meId1="+JSON.stringify(this.props.chat))
+        if(!users[meId]) { // 如果还没有获取数据, 直接不做任何显示
             return null
         }
         const targetId = this.props.match.params.userid
