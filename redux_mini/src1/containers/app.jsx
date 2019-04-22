@@ -1,6 +1,6 @@
 import React from 'react'
-import {connect} from 'react-redux'
-//import {connect} from '../libs/react-redux'
+// import {connect} from 'react-redux'
+import {connect} from '../libs/react-redux'
 
 import {increment, decrement, addMsg} from '../redux/actions'
 import Counter from '../components/counter'
