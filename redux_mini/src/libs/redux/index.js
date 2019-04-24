@@ -1,43 +1,67 @@
 /*
-* redux模块：对象
-* 1.createStore(reducer)：接收一个reducer函数，返回一个store对象
-*   使用：createStore(reducre)
-* 2.combineReducers(reducers)：接收一个包含多个reducer函数的对象，返回一个新的reducer函数
-*   使用：export default combineReducers({count, msgs})
-* 3.store对象
-* getState():得到内部管理state对象
-* dispatch(action):分发action，会触发reducer调用，返回一个新的state，调用所有绑定的listener
-* subscribe(listener)：订阅一个state的监听器
-* */
+redux模块
+1). redux模块整体是一个对象模块
+2). 内部包含几个函数
+    createStore()
+    combineReducers()
+    applyMiddleware()  // 太难暂不实现
+3). store对象的功能
+    getState()
+    dispatch(action)
+    subscibe(listener)
+ */
 
-export function createStore (reducer) {
+/*
+创建store对象的函数
+ */
+export function createStore(reducer) {
+  // 内部管理的state
+  let state
+  // 用来缓存监听的数组容器
+  const listeners = []
+  // 初始调用reducer得到初始state值
+  state = reducer(state, {type: '@@mini-redux/INIT'})
 
-    // 内部state
-    let state
-    // 内部保存n个listener的数组
-    const listeners = []
-    // 第一次调用reducer得到初始状态并保存
-    state = reducer(state, {type: '@mini-redux'})
+  /*
+  获取当前状态
+   */
+  function getState() {
+    return state
+  }
 
-    function getState () {
-        return state
-    }
+  /*
+  分发消息
+   */
+  function dispatch(action) {
+    // 调用reducer, 得到新的state
+    state = reducer(state, action)
+    // 调用监听缓存中的所有Listener, 通知状态变化
+    listeners.forEach(listener => listener())
+  }
 
-    function dispatch (action) {
-        // 调用reducer，得到一个新的state，保存上
-        state = reducer(state, action)
-        // 调用listeners中所有的监视回调函数
-        listeners.forEach(listener => listener())
-    }
+  /*
+  订阅监听
+   */
+  function subscribe(listener) {
+    // 将新的监听添加到监听缓存容器中
+    listeners.push(listener)
+  }
 
-    // 订阅一个state的监听器
-    function subscribe (listener) {
-        listeners.push(listener)
-    }
-    
-    return {getState, dispatch, subscribe}
+  // 向外暴露store对象
+  return {getState, dispatch, subscribe}
 }
 
-export function combineReducers (reducers) {
-    
+/*
+合并多个reducer的函数
+ */
+export const combineReducers = (reducers) => {
+  // 返回一个reduer声明函数
+  return (state = {}, action) => {
+    // 返回包含所有reducer状态的总state对象
+    return Object.keys(reducers).reduce((preState, key) => {
+      // 调用对应的reducer函数得到对应的新state, 并保存到总state中
+      preState[key] = reducers[key](state[key], action)
+      return preState
+    }, {})
+  }
 }
